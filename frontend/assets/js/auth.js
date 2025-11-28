@@ -6,48 +6,106 @@ const formTitle = document.getElementById("form-title");
 const toggleText = document.getElementById("toggle-text");
 const toggleLink = document.getElementById("toggle-link");
 const nameInput = document.getElementById("name");
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const submitButton = authForm.querySelector("button");
 
-let isLogin = true; // Start with login mode
+let isLogin = true;
 
-// Toggle between login/signup mode
-toggleLink.addEventListener("click", (e) => {
-  e.preventDefault();
+// 🔁 Toggle login/signup UI
+function toggleAuthMode() {
   isLogin = !isLogin;
 
   if (isLogin) {
     formTitle.textContent = "Login";
-    toggleText.innerHTML = `Don’t have an account? <a href="#" id="toggle-link">Sign up</a>`;
     nameInput.classList.add("hidden");
-    authForm.querySelector("button").textContent = "Login";
+    submitButton.textContent = "Login";
+    toggleText.innerHTML = `
+      Don’t have an account?
+      <a href="#" id="toggle-link">Sign up</a>
+    `;
   } else {
     formTitle.textContent = "Sign Up";
-    toggleText.innerHTML = `Already have an account? <a href="#" id="toggle-link">Login</a>`;
     nameInput.classList.remove("hidden");
-    authForm.querySelector("button").textContent = "Sign Up";
+    submitButton.textContent = "Sign Up";
+    toggleText.innerHTML = `
+      Already have an account?
+      <a href="#" id="toggle-link">Login</a>
+    `;
   }
+
+  document
+    .getElementById("toggle-link")
+    .addEventListener("click", (e) => {
+      e.preventDefault();
+      toggleAuthMode();
+    });
+}
+
+toggleLink.addEventListener("click", (e) => {
+  e.preventDefault();
+  toggleAuthMode();
 });
 
-// Handle form submission
+// ✨ Toast helper
+function showMessage(message, isError = false) {
+  const msgDiv = document.createElement("div");
+  msgDiv.textContent = message;
+  msgDiv.style.position = "fixed";
+  msgDiv.style.top = "20px";
+  msgDiv.style.left = "50%";
+  msgDiv.style.transform = "translateX(-50%)";
+  msgDiv.style.background = isError ? "#e53e3e" : "#2f855a";
+  msgDiv.style.color = "white";
+  msgDiv.style.padding = "10px 20px";
+  msgDiv.style.borderRadius = "8px";
+  msgDiv.style.boxShadow = "0 2px 8px rgba(0,0,0,0.2)";
+  msgDiv.style.zIndex = "1000";
+  document.body.appendChild(msgDiv);
+  setTimeout(() => msgDiv.remove(), 2500);
+}
+
+function validateInputs() {
+  if (!emailInput.value.trim() || !passwordInput.value.trim()) {
+    showMessage("Please fill out all required fields.", true);
+    return false;
+  }
+  if (!isLogin && !nameInput.value.trim()) {
+    showMessage("Please enter your name.", true);
+    return false;
+  }
+  return true;
+}
+
+// 🚀 Handle login/signup
 authForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const name = document.getElementById("name").value.trim();
+  if (!validateInputs()) return;
+
+  submitButton.disabled = true;
+  submitButton.textContent = isLogin ? "Logging in..." : "Signing up...";
+
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
+  const name = nameInput.value.trim();
 
   try {
     if (isLogin) {
-      // Login
       const res = await apiRequest("/auth/login", "POST", { email, password });
       localStorage.setItem("token", res.token);
-      alert("✅ Logged in successfully!");
-      window.location.href = "./product.html";
+      localStorage.setItem("user", JSON.stringify(res.user));
+      showMessage("✅ Logged in successfully!");
+      setTimeout(() => (window.location.href = "./product.html"), 1000);
     } else {
-      // Signup
-      const res = await apiRequest("/auth/signup", "POST", { name, email, password });
-      alert("✅ Account created successfully! Please log in.");
-      window.location.reload();
+      await apiRequest("/auth/signup", "POST", { name, email, password });
+      showMessage("✅ Account created! Please log in.");
+      setTimeout(() => window.location.reload(), 1500);
     }
   } catch (err) {
-    alert("❌ " + err.message);
+    showMessage("❌ " + err.message, true);
+    console.error("Auth error:", err);
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = isLogin ? "Login" : "Sign Up";
   }
 });

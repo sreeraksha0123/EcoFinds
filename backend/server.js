@@ -2,55 +2,92 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import morgan from "morgan";
 import { initDB } from "./config/db.js";
 
-// Load environment variables
+// ============================================
+// 🌿 Load Environment Variables
+// ============================================
 dotenv.config();
 
-// Create Express app
+// ============================================
+// 🚀 Initialize Express App
+// ============================================
 const app = express();
 
-// ✅ FIX: Proper CORS configuration for frontend (Live Server)
+// ============================================
+// 🧾 Logging Middleware (Morgan)
+// ============================================
+// Use detailed request logging in development
+if (process.env.NODE_ENV !== "production") {
+  app.use(morgan("dev"));
+}
+
+// ============================================
+// 🔐 CORS Configuration
+// ============================================
 app.use(
   cors({
-    origin: ["http://127.0.0.1:5500", "http://localhost:5500"], // frontend URLs
+    origin: [
+      "http://127.0.0.1:5500",
+      "http://localhost:5500"
+    ],
     methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );
 
-// Middleware to parse JSON requests
+
+// ============================================
+// 🧠 JSON Parser
+// ============================================
 app.use(express.json());
 
-// Import routes
+// ============================================
+// 🔗 Import Routes
+// ============================================
 import authRoutes from "./routes/authRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
 
-// Default test route
+// ============================================
+// 🌱 Default Route (Health Check)
+// ============================================
 app.get("/", (req, res) => {
-  res.json({ message: "🌿 EcoFinds API is running successfully!" });
+  res.status(200).json({
+    success: true,
+    message: "🌿 EcoFinds API is running successfully!",
+    environment: process.env.NODE_ENV || "development",
+    timestamp: new Date().toISOString(),
+  });
 });
 
-// Start server and connect to DB
+// ============================================
+// 💾 Database + Server Startup
+// ============================================
 const startServer = async () => {
   try {
-    await initDB(); // initialize SQLite
+    // Initialize SQLite database
+    await initDB();
 
-    // ✅ Attach routes after DB is ready
+    // Attach routes AFTER DB is ready
     app.use("/api/auth", authRoutes);
     app.use("/api/products", productRoutes);
     app.use("/api/cart", cartRoutes);
 
     const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () =>
-      console.log(`✅ Server running smoothly on port ${PORT}`)
-    );
+
+    app.listen(PORT, () => {
+      console.log("🗄️ SQLite database initialized successfully!");
+      console.log(`✅ Server running on port ${PORT}`);
+      console.log(`🌐 API: http://localhost:${PORT}`);
+    });
   } catch (error) {
     console.error("❌ Error starting server:", error);
     process.exit(1);
   }
 };
 
-// Run the server
+// Start the server
 startServer();
