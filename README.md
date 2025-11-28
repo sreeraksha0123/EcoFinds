@@ -175,14 +175,12 @@ We love your input! We want to make contributing to EcoFinds as easy and transpa
 5. Open a Pull Request
 
 ## 👨‍💻 Author
+**Sree Raksha S P**  
+💻 Full Stack Developer & Data Enthusiast
 
-**Sree Raksha S P**
-
-- 💼 [LinkedIn](https://www.linkedin.com/in/sreeraksha0123/)
-- 💻 [GitHub](https://github.com/sreeraksha0123)
-- 🏆 [LeetCode](https://leetcode.com/u/sreeraksha0123/)
-- ⚡ [CodeForces](https://codeforces.com/profile/sreeraksha0123)
-- 🍽️ [CodeChef](https://www.codechef.com/users/sreeraksha0123)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/sreeraksha0123)
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/sreeraksha0123)
+[![LeetCode](https://img.shields.io/badge/LeetCode-FFA116?style=for-the-badge&logo=leetcode&logoColor=white)](https://leetcode.com/u/sreeraksha0123/)
 
 
 
