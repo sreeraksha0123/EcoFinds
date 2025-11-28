@@ -10,32 +10,47 @@ dotenv.config();
 // Create Express app
 const app = express();
 
-// Middleware
-app.use(cors());
-app.use(express.json()); // Parses incoming JSON
+// ✅ FIX: Proper CORS configuration for frontend (Live Server)
+app.use(
+  cors({
+    origin: ["http://127.0.0.1:5500", "http://localhost:5500"], // frontend URLs
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
 
-// Initialize database
-const dbPromise = initDB();
+// Middleware to parse JSON requests
+app.use(express.json());
 
-// Routes
+// Import routes
 import authRoutes from "./routes/authRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
 
-// Attach routes with API prefix
-app.use("/api/auth", authRoutes);
-app.use("/api/products", productRoutes);
-app.use("/api/cart", cartRoutes);
-
-// Default route
+// Default test route
 app.get("/", (req, res) => {
-  res.json({ message: "EcoFinds API is running 🚀" });
+  res.json({ message: "🌿 EcoFinds API is running successfully!" });
 });
 
-// Start server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
-});
+// Start server and connect to DB
+const startServer = async () => {
+  try {
+    await initDB(); // initialize SQLite
 
-export { dbPromise };
+    // ✅ Attach routes after DB is ready
+    app.use("/api/auth", authRoutes);
+    app.use("/api/products", productRoutes);
+    app.use("/api/cart", cartRoutes);
+
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () =>
+      console.log(`✅ Server running smoothly on port ${PORT}`)
+    );
+  } catch (error) {
+    console.error("❌ Error starting server:", error);
+    process.exit(1);
+  }
+};
+
+// Run the server
+startServer();
