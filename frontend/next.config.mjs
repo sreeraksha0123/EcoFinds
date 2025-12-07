@@ -1,6 +1,8 @@
 // next.config.mjs
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   webpack: (config) => config,
+
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "m.media-amazon.com" },
@@ -10,8 +12,13 @@ const nextConfig = {
       { protocol: "https", hostname: "*.googleusercontent.com" },
     ],
   },
+
   productionBrowserSourceMaps: false,
-  experimental: {},
+
+  // ✅ Force Webpack instead of Turbopack
+  experimental: {
+    turbo: false,
+  },
 };
 
 export default nextConfig;
